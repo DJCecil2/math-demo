@@ -1,0 +1,3 @@
+name = Math Demo
+description = A simple module that does math operations
+core = 7.x

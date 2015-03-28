@@ -1,0 +1,15 @@
+form#math-demo-do-math-form fieldset {
+  display: table;
+}
+form#math-demo-do-math-form fieldset > div {
+  display: table-row;
+}
+form#math-demo-do-math-form fieldset > div .form-item {
+  display: table-cell;
+  vertical-align: middle;
+  padding: 10px;
+}
+form#math-demo-do-math-form p.description {
+  font-weight: bold;
+  font-style: italic;
+}

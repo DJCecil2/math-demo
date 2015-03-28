@@ -1,0 +1,114 @@
+<?php
+/**
+ * @file
+ * A simple module that does math operations
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function math_demo_menu()
+{
+    $items['math-demo'] = array(
+        'title' => t('Math Demo'),
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('math_demo_do_math_form'),
+        'access callback' => TRUE
+    );
+
+    return $items;
+}
+
+/**
+ * Implements hook_form().
+ */
+function math_demo_do_math_form($form, &$form_state)
+{
+    drupal_add_css(drupal_get_path('module', 'math_demo') . '/css/math_demo.css', array('group' => CSS_DEFAULT, 'type' => 'file'));
+    drupal_add_js(drupal_get_path('module', 'math_demo') . '/libraries/velocity.min.js');
+    drupal_add_js(drupal_get_path('module', 'math_demo') . '/libraries/velocity.ui.js');
+    drupal_add_js(drupal_get_path('module', 'math_demo') . '/js/math_demo.js');
+
+    $form['equation_group'] = array(
+        '#type' => 'fieldset',
+        '#collapsible' => FALSE
+    );
+
+    $form['equation_group']['variable_one'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Variable 1'),
+        '#size' => 3,
+        '#maxlength' => 3,
+        '#required' => TRUE
+    );
+
+    $form['equation_group']['operator'] = array(
+        '#type' => 'select',
+        '#title' => t('Operator'),
+        '#options' => array(
+            '+' => '+',
+            '-' => '-',
+            '*' => 'x',
+            '/' => html_entity_decode('&divide;')
+        ),
+        '#required' => TRUE
+    );
+
+    $form['equation_group']['variable_two'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Variable 2'),
+        '#size' => 3,
+        '#maxlength' => 3,
+        '#required' => TRUE
+    );
+
+    $form['description'] = array(
+        '#type' => 'markup',
+        '#markup' => '<p class="description">'. t('Insert the values and click submit to calculate the equation.') .'</p>'
+    );
+
+    $form['submit'] = array(
+        '#type' => 'submit',
+        '#value' => t('Submit')
+    );
+
+    return $form;
+}
+
+function math_demo_do_math_form_validate($form, &$form_state)
+{
+    $values = $form_state['values'];
+
+    foreach($values as $field => $value) {
+
+        // If the field is a variable field, it is not empty, the field is not a number, throw an error
+        if(strpos($field, 'variable_') === 0 && !empty($value) && !is_numeric($value)) {
+            form_set_error(
+                $field,
+                t('What tom-foolery is this...? @variable_name is not an integer.', array('@variable_name' => $form['equation_group'][$field]['#title']))
+            );
+        }
+    }
+
+    if($values['operator'] === '/' && $values['variable_two'] === '0') {
+        form_set_error(
+            'variable_two',
+            t("Well, aren't you a cheeky bugger? You can't divide by 0, you'll cause the universe to implode!")
+        );
+    }
+}
+
+function math_demo_do_math_form_submit($form, &$form_state)
+{
+    $values = $form_state['values'];
+    $result = math_demo_process_equation($values['variable_one'], $values['operator'], $values['variable_two']);
+
+    $equation = $values['variable_one']. ' ' .$form['equation_group']['operator']['#options'][$values['operator']]. ' ' .$values['variable_two']. ' = ' . (sprintf(round($result, 2) == intval($result) ? "%d" : "%.2f", $result));
+
+    drupal_set_message($equation, 'status');
+};
+
+function math_demo_process_equation($v1, $op, $v2)
+{
+    return eval('return '.$v1.$op.$v2.';');
+}

@@ -111,4 +111,4 @@ function math_demo_do_math_form_submit($form, &$form_state)
 function math_demo_process_equation($v1, $op, $v2)
 {
     return eval('return '.$v1.$op.$v2.';');
-}
+};

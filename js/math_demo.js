@@ -1,7 +1,11 @@
 (function ($) {
 
+    function isNumber(n) {
+      return !isNaN(parseFloat(n)) && isFinite(n);
+    }
+
     var validateForm = function() {
-        if($.isNaN($('input[name=variable_one]').val()) || $.isNaN($('input[name=variable_two]').val()) || $('[name=operator]').val() === '') {
+        if(!isNumber($('input[name=variable_one]').val()) || !isNumber($('input[name=variable_two]').val()) || $('[name=operator]').val() === '') {
             return false;
         } else if($('[name=operator]').val() === '/' && $('input[name=variable_two]').val() === '0') {
             return false;
@@ -25,7 +29,7 @@
             });
         }
 
-        $('#math-demo-do-math-form input[type="submit"]').click(function(e) {
+        $('#math-demo-do-math-form [type="submit"]').click(function(e) {
             e.preventDefault();
 
             var form = $('#math-demo-do-math-form');
